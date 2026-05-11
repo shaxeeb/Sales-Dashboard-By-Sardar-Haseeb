@@ -1,0 +1,492 @@
+
+<h2 class="sr-only">Sales Dashboard by Sardar Haseeb — interactive dashboard with PKR currency, clickable charts, and CSV/JSON data upload</h2>
+
+<style>
+:root{--bg:#0a0e1a;--surf:#111827;--card:#1a2235;--bdr:#2a3a55;--txt:#e8edf5;--mut:#7a8ba0;--acc:#3b82f6;--acc2:#06b6d4;--acc3:#8b5cf6;--grn:#10b981;--amb:#f59e0b;--red:#ef4444;--c1:#3b82f6;--c2:#06b6d4;--c3:#8b5cf6;--c4:#10b981;--c5:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;font-size:13px}
+.wrap{padding:12px}
+.header{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 18px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.header-left{display:flex;align-items:center;gap:12px}
+.logo-badge{background:var(--acc);width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.title-block h1{font-size:17px;font-weight:700;letter-spacing:.3px;color:var(--txt)}
+.title-block p{font-size:11px;color:var(--mut);margin-top:2px}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.theme-dots{display:flex;gap:5px;align-items:center}
+.tdot{width:18px;height:18px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:.15s}
+.tdot.on{border-color:#fff;transform:scale(1.2)}
+.btn{background:var(--acc);color:#fff;border:none;border-radius:7px;padding:5px 11px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.btn:hover{opacity:.85}
+.btn-ghost{background:var(--card);color:var(--mut);border:1px solid var(--bdr);border-radius:7px;padding:5px 11px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.btn-ghost:hover{border-color:var(--acc);color:var(--acc)}
+#fileIn{display:none}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:11px 14px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kc)}
+.kpi-lbl{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.kpi-val{font-size:19px;font-weight:700;color:var(--txt);line-height:1.1}
+.kpi-sub{font-size:10px;color:var(--mut);margin-top:2px}
+.kpi-ico{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:26px;opacity:.1}
+.two-col{display:grid;grid-template-columns:1.3fr 1fr;gap:10px;margin-bottom:12px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:12px 14px}
+.card.af{border-color:var(--acc)}
+.ctitle{font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center}
+.ftag{background:var(--acc);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;cursor:pointer;display:none}
+.ftag:hover{background:#2563eb}
+.clist{display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto}
+.crow{display:flex;align-items:center;gap:7px;cursor:pointer;padding:3px 5px;border-radius:5px;transition:.15s}
+.crow:hover{background:rgba(59,130,246,.1)}
+.crow.sel{background:rgba(59,130,246,.18);border-left:2px solid var(--acc)}
+.cn{flex:1;font-size:12px;color:var(--txt)}
+.bw{flex:2;height:5px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.bi{height:100%;border-radius:3px;transition:.4s}
+.cv{font-size:11px;color:var(--mut);min-width:55px;text-align:right}
+.fbar{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:8px;padding:7px 12px;margin-bottom:10px;font-size:12px;color:var(--acc2);display:none;align-items:center;gap:8px}
+.clr{background:none;border:1px solid var(--bdr);color:var(--mut);border-radius:5px;padding:2px 7px;font-size:11px;cursor:pointer}
+.clr:hover{border-color:var(--acc);color:var(--acc)}
+.tbl-wrap{overflow-x:auto;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:var(--surf);color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:8px 10px;text-align:left;border-bottom:1px solid var(--bdr);white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{color:var(--acc)}
+tbody tr{border-bottom:1px solid var(--bdr);transition:.15s;cursor:pointer}
+tbody tr:hover{background:rgba(59,130,246,.07)}
+tbody tr.sel-row{background:rgba(59,130,246,.15)}
+tbody td{padding:7px 10px;color:var(--txt);white-space:nowrap}
+tbody td.num{text-align:right;font-variant-numeric:tabular-nums}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.pg{display:flex;align-items:center;gap:6px;margin-top:8px;justify-content:flex-end}
+.pg button{background:var(--card);border:1px solid var(--bdr);color:var(--mut);border-radius:5px;padding:3px 9px;font-size:11px;cursor:pointer}
+.pg button:hover{border-color:var(--acc);color:var(--acc)}
+.pg button.cur{background:var(--acc);color:#fff;border-color:var(--acc)}
+.pg span{font-size:11px;color:var(--mut)}
+.search-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.search-row input,.search-row select{background:var(--surf);border:1px solid var(--bdr);color:var(--txt);border-radius:7px;padding:5px 10px;font-size:12px;outline:none}
+.search-row input{flex:1;min-width:120px}
+.search-row input:focus,.search-row select:focus{border-color:var(--acc)}
+.seg-leg{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px;justify-content:center}
+.sleg{display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:2px 6px;border-radius:4px}
+.sleg:hover{background:rgba(255,255,255,.06)}
+.sleg.sel{background:rgba(255,255,255,.1)}
+.sdot{width:8px;height:8px;border-radius:50%}
+</style>
+
+<div class="wrap" id="app">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-badge"><i class="ti ti-chart-bar" style="color:#fff;font-size:20px" aria-hidden="true"></i></div>
+      <div class="title-block">
+        <h1>Sales Dashboard</h1>
+        <p>by Sardar Haseeb &nbsp;|&nbsp; Currency: PKR (₨)</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="theme-dots">
+        <span style="font-size:10px;color:var(--mut)">Theme:</span>
+        <div class="tdot on" style="background:#3b82f6" onclick="setTheme(0)" title="Dark Navy"></div>
+        <div class="tdot" style="background:#7c3aed" onclick="setTheme(1)" title="Midnight Purple"></div>
+        <div class="tdot" style="background:#059669" onclick="setTheme(2)" title="Forest Green"></div>
+        <div class="tdot" style="background:#d97706" onclick="setTheme(3)" title="Amber Glow"></div>
+        <div class="tdot" style="background:#e2e8f0;border:1px solid #94a3b8" onclick="setTheme(4)" title="Clean Light"></div>
+      </div>
+      <label class="btn"><i class="ti ti-upload" aria-hidden="true"></i> Upload Data<input type="file" id="fileIn" accept=".csv,.json"></label>
+      <button class="btn-ghost" onclick="dlTemplate()"><i class="ti ti-download" aria-hidden="true"></i> Template</button>
+    </div>
+  </div>
+
+  <div class="fbar" id="fbar">
+    <i class="ti ti-filter" aria-hidden="true"></i>
+    <span id="fdesc">Filtered</span>
+    <button class="clr" onclick="clearAll()">✕ Clear all</button>
+  </div>
+
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <div class="two-col">
+    <div class="card" id="regionCard">
+      <div class="ctitle">Sales by Region <span class="ftag" id="ftRegion" onclick="clearF('region')">✕ clear</span></div>
+      <div style="position:relative;height:190px"><canvas id="regionChart" role="img" aria-label="Sales by region bar chart">Sales by region.</canvas></div>
+    </div>
+    <div class="card" id="cityCard">
+      <div class="ctitle">Sales by City <span class="ftag" id="ftCity" onclick="clearF('city')">✕ clear</span></div>
+      <div class="clist" id="cityList"></div>
+    </div>
+  </div>
+
+  <div class="three-col">
+    <div class="card" id="monthCard">
+      <div class="ctitle">Monthly Sales <span class="ftag" id="ftMonth" onclick="clearF('month')">✕ clear</span></div>
+      <div style="position:relative;height:150px"><canvas id="monthChart" role="img" aria-label="Monthly sales chart">Monthly sales.</canvas></div>
+    </div>
+    <div class="card" id="segCard">
+      <div class="ctitle">By Segment <span class="ftag" id="ftSeg" onclick="clearF('segment')">✕ clear</span></div>
+      <div style="position:relative;height:115px"><canvas id="segChart" role="img" aria-label="Sales by segment pie chart">Segment breakdown.</canvas></div>
+      <div class="seg-leg" id="segLeg"></div>
+    </div>
+    <div class="card" id="prodCard">
+      <div class="ctitle">Top Products <span class="ftag" id="ftProd" onclick="clearF('product')">✕ clear</span></div>
+      <div class="clist" id="prodList"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <div class="ctitle" style="margin-bottom:8px">
+      Sales Transactions
+      <span style="font-size:10px;color:var(--mut)" id="rowCount"></span>
+    </div>
+    <div class="search-row">
+      <input type="text" id="srch" placeholder="Search client, city, product..." oninput="renderTable()">
+      <select id="fltRegion" onchange="renderTable()"><option value="">All Regions</option></select>
+      <select id="fltCity" onchange="renderTable()"><option value="">All Cities</option></select>
+      <select id="fltSeg" onchange="renderTable()"><option value="">All Segments</option></select>
+    </div>
+    <div class="tbl-wrap">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th onclick="sortBy('date')">Date <i class="ti ti-arrows-sort" aria-hidden="true"></i></th>
+            <th onclick="sortBy('client_name')">Client Name <i class="ti ti-arrows-sort" aria-hidden="true"></i></th>
+            <th onclick="sortBy('city')">City <i class="ti ti-arrows-sort" aria-hidden="true"></i></th>
+            <th onclick="sortBy('region')">Region <i class="ti ti-arrows-sort" aria-hidden="true"></i></th>
+            <th onclick="sortBy('product')">Product Name <i class="ti ti-arrows-sort" aria-hidden="true"></i></th>
+            <th onclick="sortBy('quantity')" style="text-align:right">Total Qty <i class="ti ti-arrows-sort" aria-hidden="true"></i></th>
+            <th onclick="sortBy('sales')" style="text-align:right">Total Amount <i class="ti ti-arrows-sort" aria-hidden="true"></i></th>
+          </tr>
+        </thead>
+        <tbody id="tBody"></tbody>
+      </table>
+    </div>
+    <div class="pg" id="pgCtrl"></div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const THEMES=[
+  {bg:'#0a0e1a',surf:'#111827',card:'#1a2235',bdr:'#2a3a55',txt:'#e8edf5',mut:'#7a8ba0',acc:'#3b82f6',acc2:'#06b6d4',acc3:'#8b5cf6',grn:'#10b981',amb:'#f59e0b',ch:['#3b82f6','#06b6d4','#8b5cf6','#10b981','#f59e0b']},
+  {bg:'#0d0a1a',surf:'#130e24',card:'#1c1538',bdr:'#342b55',txt:'#e5e0f5',mut:'#8070a0',acc:'#a855f7',acc2:'#ec4899',acc3:'#6366f1',grn:'#22d3ee',amb:'#fb923c',ch:['#a855f7','#ec4899','#6366f1','#22d3ee','#fb923c']},
+  {bg:'#040d04',surf:'#081208',card:'#0d1c0d',bdr:'#1a3a1a',txt:'#d5f0d5',mut:'#5a8a5a',acc:'#22c55e',acc2:'#86efac',acc3:'#4ade80',grn:'#06b6d4',amb:'#fbbf24',ch:['#22c55e','#86efac','#4ade80','#06b6d4','#fbbf24']},
+  {bg:'#0f0900',surf:'#1a1000',card:'#251800',bdr:'#40280a',txt:'#fdf5d5',mut:'#a08040',acc:'#f59e0b',acc2:'#fb923c',acc3:'#fbbf24',grn:'#84cc16',amb:'#ef4444',ch:['#f59e0b','#fb923c','#fbbf24','#84cc16','#ef4444']},
+  {bg:'#f4f6fa',surf:'#ffffff',card:'#ffffff',bdr:'#e2e8f0',txt:'#1e293b',mut:'#64748b',acc:'#3b82f6',acc2:'#0891b2',acc3:'#7c3aed',grn:'#059669',amb:'#d97706',ch:['#3b82f6','#0891b2','#7c3aed','#059669','#d97706']}
+];
+let CT=0;
+
+function setTheme(i){
+  CT=i;const t=THEMES[i];
+  const r=document.documentElement;
+  [['--bg',t.bg],['--surf',t.surf],['--card',t.card],['--bdr',t.bdr],['--txt',t.txt],['--mut',t.mut],['--acc',t.acc],['--acc2',t.acc2],['--acc3',t.acc3],['--grn',t.grn],['--amb',t.amb],['--c1',t.ch[0]],['--c2',t.ch[1]],['--c3',t.ch[2]],['--c4',t.ch[3]],['--c5',t.ch[4]]].forEach(([k,v])=>r.style.setProperty(k,v));
+  document.querySelectorAll('.tdot').forEach((d,j)=>d.classList.toggle('on',j===i));
+  rebuildCharts();
+}
+
+const PKR=v=>{
+  if(v>=1e7)return '₨'+(v/1e7).toFixed(2)+'Cr';
+  if(v>=1e5)return '₨'+(v/1e5).toFixed(1)+'L';
+  if(v>=1e3)return '₨'+(v/1e3).toFixed(0)+'K';
+  return '₨'+Math.round(v).toLocaleString();
+};
+const PKRfull=v=>'₨'+Math.round(v).toLocaleString('en-PK');
+
+const SAMPLE=[
+  {date:'2024-01-05',client_name:'Ahmed Traders',city:'Karachi',region:'South',segment:'Consumer',product:'Mobile Phones',quantity:12,sales:324000,profit:38880},
+  {date:'2024-01-12',client_name:'Butt Enterprises',city:'Lahore',region:'Punjab',segment:'Corporate',product:'Office Chairs',quantity:25,sales:187500,profit:22500},
+  {date:'2024-01-20',client_name:'Malik & Sons',city:'Islamabad',region:'Federal',segment:'Corporate',product:'Laptops',quantity:8,sales:560000,profit:67200},
+  {date:'2024-02-03',client_name:'Khan Wholesale',city:'Peshawar',region:'KPK',segment:'Home Office',product:'Storage Units',quantity:15,sales:97500,profit:11700},
+  {date:'2024-02-14',client_name:'Cheema Brothers',city:'Faisalabad',region:'Punjab',segment:'Consumer',product:'Tables',quantity:10,sales:145000,profit:17400},
+  {date:'2024-02-28',client_name:'Iqbal Stores',city:'Multan',region:'Punjab',segment:'Consumer',product:'Binders',quantity:50,sales:37500,profit:4500},
+  {date:'2024-03-07',client_name:'Siddiqui Corp',city:'Karachi',region:'South',segment:'Corporate',product:'Printers',quantity:6,sales:198000,profit:23760},
+  {date:'2024-03-15',client_name:'Rehman Trading',city:'Rawalpindi',region:'Federal',segment:'Home Office',product:'Accessories',quantity:30,sales:54000,profit:6480},
+  {date:'2024-03-22',client_name:'Javed & Co',city:'Quetta',region:'Balochistan',segment:'Consumer',product:'Copiers',quantity:3,sales:270000,profit:32400},
+  {date:'2024-04-01',client_name:'Farooq Enterprises',city:'Lahore',region:'Punjab',segment:'Corporate',product:'Mobile Phones',quantity:20,sales:540000,profit:64800},
+  {date:'2024-04-10',client_name:'Riaz Traders',city:'Hyderabad',region:'South',segment:'Consumer',product:'Bookcases',quantity:8,sales:88000,profit:10560},
+  {date:'2024-04-18',client_name:'Nawaz Brothers',city:'Islamabad',region:'Federal',segment:'Corporate',product:'Laptops',quantity:12,sales:840000,profit:100800},
+  {date:'2024-05-05',client_name:'Shahid Wholesale',city:'Karachi',region:'South',segment:'Consumer',product:'Appliances',quantity:18,sales:198000,profit:23760},
+  {date:'2024-05-20',client_name:'Tariq & Sons',city:'Sialkot',region:'Punjab',segment:'Home Office',product:'Tables',quantity:6,sales:87000,profit:10440},
+  {date:'2024-06-02',client_name:'Usman Traders',city:'Lahore',region:'Punjab',segment:'Corporate',product:'Chairs',quantity:35,sales:262500,profit:31500},
+  {date:'2024-06-15',client_name:'Zubair Corp',city:'Peshawar',region:'KPK',segment:'Consumer',product:'Storage Units',quantity:20,sales:130000,profit:15600},
+  {date:'2024-07-08',client_name:'Aslam Enterprises',city:'Multan',region:'Punjab',segment:'Corporate',product:'Printers',quantity:4,sales:132000,profit:15840},
+  {date:'2024-07-25',client_name:'Bilal Traders',city:'Rawalpindi',region:'Federal',segment:'Consumer',product:'Mobile Phones',quantity:15,sales:405000,profit:48600},
+  {date:'2024-08-12',client_name:'Saeed Brothers',city:'Faisalabad',region:'Punjab',segment:'Home Office',product:'Binders',quantity:80,sales:60000,profit:7200},
+  {date:'2024-08-28',client_name:'Asif Trading Co',city:'Karachi',region:'South',segment:'Corporate',product:'Accessories',quantity:45,sales:81000,profit:9720},
+  {date:'2024-09-10',client_name:'Hamid Stores',city:'Lahore',region:'Punjab',segment:'Consumer',product:'Bookcases',quantity:12,sales:132000,profit:15840},
+  {date:'2024-09-22',client_name:'Imran & Co',city:'Islamabad',region:'Federal',segment:'Corporate',product:'Copiers',quantity:2,sales:180000,profit:21600},
+  {date:'2024-10-05',client_name:'Yousaf Wholesale',city:'Quetta',region:'Balochistan',segment:'Consumer',product:'Laptops',quantity:10,sales:700000,profit:84000},
+  {date:'2024-10-18',client_name:'Nasir Enterprises',city:'Hyderabad',region:'South',segment:'Home Office',product:'Tables',quantity:5,sales:72500,profit:8700},
+  {date:'2024-11-02',client_name:'Zahid Traders',city:'Karachi',region:'South',segment:'Corporate',product:'Mobile Phones',quantity:30,sales:810000,profit:97200},
+  {date:'2024-11-15',client_name:'Shakeel Brothers',city:'Sialkot',region:'Punjab',segment:'Consumer',product:'Chairs',quantity:20,sales:150000,profit:18000},
+  {date:'2024-12-01',client_name:'Waqar Corp',city:'Lahore',region:'Punjab',segment:'Corporate',product:'Printers',quantity:9,sales:297000,profit:35640},
+  {date:'2024-12-18',client_name:'Omar Trading',city:'Rawalpindi',region:'Federal',segment:'Home Office',product:'Storage Units',quantity:25,sales:162500,profit:19500}
+];
+
+let allRows=[...SAMPLE];
+let filters={region:null,city:null,month:null,segment:null,product:null};
+let sortCol='date',sortDir=1,page=1;
+const PER=8;
+let rChartI=null,mChartI=null,sChartI=null;
+
+function getFiltered(){
+  return allRows.filter(r=>{
+    if(filters.region&&r.region!==filters.region)return false;
+    if(filters.city&&r.city!==filters.city)return false;
+    if(filters.month&&!r.date.startsWith('2024-'+filters.month))return false;
+    if(filters.segment&&r.segment!==filters.segment)return false;
+    if(filters.product&&r.product!==filters.product)return false;
+    return true;
+  });
+}
+
+function agg(rows,key){
+  const m={};rows.forEach(r=>{m[r[key]]=(m[r[key]]||0)+r.sales});return m;
+}
+function aggQty(rows,key){
+  const m={};rows.forEach(r=>{m[r[key]]=(m[r[key]]||0)+r.quantity});return m;
+}
+
+function renderKPIs(){
+  const rows=getFiltered();
+  const sales=rows.reduce((a,r)=>a+r.sales,0);
+  const profit=rows.reduce((a,r)=>a+r.profit,0);
+  const qty=rows.reduce((a,r)=>a+r.quantity,0);
+  const margin=sales?((profit/sales)*100).toFixed(1):0;
+  const t=THEMES[CT];
+  const kpis=[
+    {lbl:'Total Sales',val:PKR(sales),sub:PKRfull(sales),ico:'ti-currency-rupee',kc:t.ch[0]},
+    {lbl:'Total Profit',val:PKR(profit),sub:PKRfull(profit),ico:'ti-trending-up',kc:t.grn},
+    {lbl:'Margin %',val:margin+'%',sub:'Net profit margin',ico:'ti-target',kc:t.ch[1]},
+    {lbl:'Total Qty',val:qty.toLocaleString(),sub:'Units sold',ico:'ti-package',kc:t.amb}
+  ];
+  document.getElementById('kpiRow').innerHTML=kpis.map(k=>`<div class="kpi" style="--kc:${k.kc}"><div class="kpi-lbl">${k.lbl}</div><div class="kpi-val">${k.val}</div><div class="kpi-sub">${k.sub}</div><div class="kpi-ico"><i class="ti ${k.ico}" aria-hidden="true"></i></div></div>`).join('');
+}
+
+function renderRegionChart(){
+  const rows=getFiltered();
+  const aggs=agg(rows,'region');
+  const labels=Object.keys(aggs);
+  const vals=Object.values(aggs);
+  const t=THEMES[CT];
+  const colors=labels.map(l=>filters.region===l?t.acc:t.ch[0]+'99');
+  if(rChartI){rChartI.destroy();rChartI=null}
+  rChartI=new Chart(document.getElementById('regionChart'),{
+    type:'bar',
+    data:{labels,datasets:[{data:vals,backgroundColor:colors,borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+PKRfull(c.raw)}}},
+      scales:{x:{ticks:{color:t.mut,font:{size:10}},grid:{color:'transparent'}},y:{ticks:{color:t.mut,font:{size:9},callback:v=>PKR(v)},grid:{color:t.bdr+'55'}}},
+      onClick:(_,els)=>{if(els.length){const l=labels[els[0].index];setFilter('region',l===filters.region?null:l)}}}
+  });
+}
+
+function renderCityList(){
+  const rows=getFiltered();
+  const aggs=agg(rows,'city');
+  const entries=Object.entries(aggs).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const max=entries[0]?.[1]||1;
+  const t=THEMES[CT];
+  document.getElementById('cityList').innerHTML=entries.map(([c,v])=>`
+    <div class="crow${filters.city===c?' sel':''}" onclick="setFilter('city','${c}'==='${filters.city}'?null:'${c}')">
+      <span class="cn">${c}</span>
+      <div class="bw"><div class="bi" style="width:${Math.round(v/max*100)}%;background:${t.ch[1]}"></div></div>
+      <span class="cv">${PKR(v)}</span>
+    </div>`).join('');
+}
+
+function renderMonthChart(){
+  const rows=getFiltered();
+  const MONTHS=['01','02','03','04','05','06','07','08','09','10','11','12'];
+  const MLBL=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const aggs={};MONTHS.forEach(m=>{aggs[m]=0});
+  rows.forEach(r=>{const m=r.date.slice(5,7);if(aggs[m]!==undefined)aggs[m]+=r.sales});
+  const vals=MONTHS.map(m=>aggs[m]);
+  const t=THEMES[CT];
+  const colors=MONTHS.map(m=>filters.month===m?t.acc:t.ch[2]+'cc');
+  if(mChartI){mChartI.destroy();mChartI=null}
+  mChartI=new Chart(document.getElementById('monthChart'),{
+    type:'bar',
+    data:{labels:MLBL,datasets:[{data:vals,backgroundColor:colors,borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+PKRfull(c.raw)}}},
+      scales:{x:{ticks:{color:t.mut,font:{size:9},autoSkip:false,maxRotation:0},grid:{color:'transparent'}},y:{ticks:{color:t.mut,font:{size:9},callback:v=>PKR(v)},grid:{color:t.bdr+'55'}}},
+      onClick:(_,els)=>{if(els.length){const m=MONTHS[els[0].index];setFilter('month',m===filters.month?null:m)}}}
+  });
+}
+
+function renderSegChart(){
+  const rows=getFiltered();
+  const aggs=agg(rows,'segment');
+  const labels=Object.keys(aggs);
+  const vals=Object.values(aggs);
+  const t=THEMES[CT];
+  const colors=t.ch.slice(0,labels.length);
+  if(sChartI){sChartI.destroy();sChartI=null}
+  sChartI=new Chart(document.getElementById('segChart'),{
+    type:'doughnut',
+    data:{labels,datasets:[{data:vals,backgroundColor:colors,borderWidth:2,borderColor:t.card,hoverOffset:5}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.label}: ${PKR(c.raw)}`}}},
+      onClick:(_,els)=>{if(els.length){const l=labels[els[0].index];setFilter('segment',l===filters.segment?null:l)}}}
+  });
+  const tot=vals.reduce((a,b)=>a+b,0);
+  document.getElementById('segLeg').innerHTML=labels.map((l,i)=>`
+    <div class="sleg${filters.segment===l?' sel':''}" onclick="setFilter('segment','${l}'==='${filters.segment}'?null:'${l}')">
+      <div class="sdot" style="background:${colors[i]}"></div>${l} ${tot?Math.round(vals[i]/tot*100):0}%
+    </div>`).join('');
+}
+
+function renderProdList(){
+  const rows=getFiltered();
+  const aggs=agg(rows,'product');
+  const entries=Object.entries(aggs).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const max=entries[0]?.[1]||1;
+  const t=THEMES[CT];
+  document.getElementById('prodList').innerHTML=entries.map(([p,v])=>`
+    <div class="crow${filters.product===p?' sel':''}" onclick="setFilter('product','${p}'==='${filters.product}'?null:'${p}')">
+      <span class="cn">${p}</span>
+      <div class="bw"><div class="bi" style="width:${Math.round(v/max*100)}%;background:${t.ch[3]}"></div></div>
+      <span class="cv">${PKR(v)}</span>
+    </div>`).join('');
+}
+
+let tblData=[];
+function renderTable(){
+  const srch=document.getElementById('srch').value.toLowerCase();
+  const fR=document.getElementById('fltRegion').value;
+  const fC=document.getElementById('fltCity').value;
+  const fS=document.getElementById('fltSeg').value;
+  tblData=getFiltered().filter(r=>{
+    if(fR&&r.region!==fR)return false;
+    if(fC&&r.city!==fC)return false;
+    if(fS&&r.segment!==fS)return false;
+    if(srch&&!`${r.client_name}${r.city}${r.product}${r.region}`.toLowerCase().includes(srch))return false;
+    return true;
+  }).sort((a,b)=>{
+    let av=a[sortCol],bv=b[sortCol];
+    if(sortCol==='sales'||sortCol==='quantity'){av=Number(av);bv=Number(bv)}
+    return av<bv?-sortDir:av>bv?sortDir:0;
+  });
+  const total=tblData.length;
+  const pages=Math.max(1,Math.ceil(total/PER));
+  if(page>pages)page=pages;
+  const slice=tblData.slice((page-1)*PER,page*PER);
+  const segColors={'Consumer':'#3b82f6','Corporate':'#10b981','Home Office':'#f59e0b'};
+  document.getElementById('rowCount').textContent=`${total} records`;
+  document.getElementById('tBody').innerHTML=slice.map(r=>`
+    <tr>
+      <td>${r.date}</td>
+      <td>${r.client_name}</td>
+      <td>${r.city}</td>
+      <td><span class="badge" style="background:${(segColors[r.region]||'#8b5cf6')}22;color:${segColors[r.region]||'#8b5cf6'}">${r.region}</span></td>
+      <td>${r.product}</td>
+      <td class="num">${r.quantity.toLocaleString()}</td>
+      <td class="num">${PKRfull(r.sales)}</td>
+    </tr>`).join('');
+  const pgEl=document.getElementById('pgCtrl');
+  if(pages<=1){pgEl.innerHTML='';return}
+  let btns=`<span>${(page-1)*PER+1}–${Math.min(page*PER,total)} of ${total}</span>`;
+  btns+=`<button onclick="goPage(${page-1})" ${page===1?'disabled':''}>‹</button>`;
+  for(let p2=1;p2<=pages;p2++){if(p2===1||p2===pages||Math.abs(p2-page)<=1)btns+=`<button class="${p2===page?'cur':''}" onclick="goPage(${p2})">${p2}</button>`;else if(Math.abs(p2-page)===2)btns+=`<span>…</span>`}
+  btns+=`<button onclick="goPage(${page+1})" ${page===pages?'disabled':''}>›</button>`;
+  pgEl.innerHTML=btns;
+}
+
+function goPage(p){page=p;renderTable()}
+
+function sortBy(col){if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1}page=1;renderTable()}
+
+function populateDropdowns(){
+  const regions=[...new Set(allRows.map(r=>r.region))].sort();
+  const cities=[...new Set(allRows.map(r=>r.city))].sort();
+  const segs=[...new Set(allRows.map(r=>r.segment))].sort();
+  const sel=(id,opts)=>{const s=document.getElementById(id);const v=s.value;s.innerHTML=`<option value="">All ${id.replace('flt','')+'s'}</option>`+opts.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('');};
+  sel('fltRegion',regions);sel('fltCity',cities);sel('fltSeg',segs);
+}
+
+function setFilter(type,val){filters[type]=val||null;updateFbar();rebuildCharts()}
+
+function clearF(type){filters[type]=null;updateFbar();rebuildCharts()}
+
+function clearAll(){Object.keys(filters).forEach(k=>filters[k]=null);updateFbar();rebuildCharts()}
+
+function updateFbar(){
+  const active=Object.entries(filters).filter(([,v])=>v);
+  const bar=document.getElementById('fbar');
+  bar.style.display=active.length?'flex':'none';
+  if(active.length)document.getElementById('fdesc').textContent='Filtered by: '+active.map(([k,v])=>`${k}: ${v}`).join(', ');
+  const map={region:'ftRegion',city:'ftCity',month:'ftMonth',segment:'ftSeg',product:'ftProd'};
+  Object.entries(map).forEach(([k,id])=>{document.getElementById(id).style.display=filters[k]?'inline':'none'});
+}
+
+function rebuildCharts(){
+  renderKPIs();renderRegionChart();renderCityList();renderMonthChart();renderSegChart();renderProdList();renderTable();
+}
+
+document.getElementById('fileIn').addEventListener('change',function(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      if(f.name.endsWith('.json'))loadJSON(ev.target.result);
+      else loadCSV(ev.target.result);
+    }catch(err){toast('Error: '+err.message,'#ef4444')}
+  };
+  r.readAsText(f);this.value='';
+});
+
+function loadJSON(txt){
+  const d=JSON.parse(txt);
+  const rows=Array.isArray(d)?d:d.rows||d.data||[];
+  if(!rows.length)throw new Error('No rows found');
+  allRows=rows.map(normalizeRow);
+  populateDropdowns();clearAll();toast('Loaded '+allRows.length+' records');
+}
+
+function loadCSV(txt){
+  const lines=txt.trim().split('\n').filter(l=>l.trim());
+  if(lines.length<2)throw new Error('CSV too short');
+  const hdrs=lines[0].split(',').map(h=>h.trim().replace(/"/g,'').toLowerCase().replace(/\s+/g,'_'));
+  const rows=lines.slice(1).map(l=>{
+    const vals=l.split(',').map(v=>v.trim().replace(/"/g,''));
+    const obj={};hdrs.forEach((h,i)=>obj[h]=vals[i]||'');
+    return normalizeRow(obj);
+  }).filter(r=>r.sales>0||r.quantity>0);
+  if(!rows.length)throw new Error('No valid rows');
+  allRows=rows;populateDropdowns();clearAll();toast('Loaded '+allRows.length+' rows from CSV');
+}
+
+function normalizeRow(r){
+  return{
+    date:r.date||r.order_date||r.sale_date||'',
+    client_name:r.client_name||r.client||r.customer||r.customer_name||'',
+    city:r.city||'',
+    region:r.region||'',
+    segment:r.segment||'',
+    product:r.product||r.product_name||r['product name']||'',
+    quantity:parseInt(r.quantity||r.total_qty||r.qty||0),
+    sales:parseFloat(r.sales||r.total_amount||r.amount||r.revenue||0),
+    profit:parseFloat(r.profit||0)
+  };
+}
+
+function toast(msg,bg){
+  const t=document.createElement('div');
+  t.style.cssText=`position:fixed;bottom:16px;right:16px;background:${bg||'#10b981'};color:#fff;padding:9px 15px;border-radius:8px;font-size:12px;z-index:9999;font-weight:600`;
+  t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
+}
+
+function dlTemplate(){
+  const json=[
+    {date:'2024-01-05',client_name:'Ahmed Traders',city:'Karachi',region:'South',segment:'Consumer',product:'Mobile Phones',quantity:12,sales:324000,profit:38880},
+    {date:'2024-02-10',client_name:'Butt Enterprises',city:'Lahore',region:'Punjab',segment:'Corporate',product:'Laptops',quantity:5,sales:350000,profit:42000},
+    {date:'2024-03-15',client_name:'Malik & Sons',city:'Islamabad',region:'Federal',segment:'Home Office',product:'Office Chairs',quantity:20,sales:150000,profit:18000}
+  ];
+  const csv=`date,client_name,city,region,segment,product,quantity,sales,profit
+2024-01-05,Ahmed Traders,Karachi,South,Consumer,Mobile Phones,12,324000,38880
+2024-02-10,Butt Enterprises,Lahore,Punjab,Corporate,Laptops,5,350000,42000
+2024-03-15,Malik & Sons,Islamabad,Federal,Home Office,Office Chairs,20,150000,18000
+2024-04-20,Khan Wholesale,Peshawar,KPK,Consumer,Storage Units,15,97500,11700
+2024-05-25,Cheema Brothers,Faisalabad,Punjab,Corporate,Tables,10,145000,17400`;
+  [[`sardar-haseeb-template.json`,JSON.stringify(json,null,2),'application/json'],[`sardar-haseeb-template.csv`,csv,'text/csv']].forEach(([n,d,t])=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([d],{type:t}));a.download=n;a.click()});
+  toast('Templates downloaded (JSON + CSV)');
+}
+
+populateDropdowns();
+setTheme(0);
+</script>
